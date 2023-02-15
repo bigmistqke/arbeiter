@@ -5,13 +5,15 @@ Allows for state to be managed
 
 # How to use
 
+- simple example
+
 ```ts
 import Arbeiter from "arbeiter";
 
 const arbeiter = new Arbeiter(() => ({
   counter: 0,
   increment: function () {
-    // only variables accessed with `this` can be manipulated
+    // only state accessed with `this` can be manipulated
     return this.counter++;
   },
 }));
@@ -22,6 +24,8 @@ arbeiter.methods.increment().then(
   value => value // 1
 );
 ```
+
+- transfer `OffscreenCanvas`
 
 ```ts
 import Arbeiter from "arbeiter";
