@@ -9,7 +9,7 @@ type FilterFunction<T> = FilterObject<T, Function>;
 export default class Werker<STATE> {
   methods: Promisify<FilterFunction<STATE>>;
   private worker: Worker;
-  private messageId: number = 0;
+  private messageId = 0;
   private responseQueue: {
     [key: number]: { resolve: (value: unknown) => void };
   } = {};
