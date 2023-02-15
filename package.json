@@ -1,6 +1,6 @@
 {
   "name": "arbeiter",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "./dist/arbeiter.cjs",
   "module": "./dist/arbeiter.mjs",
   "exports": {
