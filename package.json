@@ -3,6 +3,7 @@
   "version": "0.0.4",
   "main": "./dist/arbeiter.cjs",
   "module": "./dist/arbeiter.mjs",
+  "types": "./dist/arbeiter.d.ts",
   "exports": {
     ".": {
       "require": "./dist/arbeiter.cjs",
