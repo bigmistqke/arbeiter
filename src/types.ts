@@ -37,7 +37,9 @@ export type StateCallback<
   OPTIONS extends Partial<Config<State>>
 > = () => {
   [K in keyof State]: State[K] extends (...args: any[]) => any
-    ? MapIfEval<State, K, State[K], OPTIONS>
+    ? OPTIONS extends undefined
+      ? MapIfEval<State, K, State[K], Record<string, never>>
+      : MapIfEval<State, K, State[K], OPTIONS>
     : State[K];
 };
 

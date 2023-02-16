@@ -149,9 +149,17 @@ export default class Factory<STATE> {
 
   construct<CONFIG extends Config<STATE>>(
     methodsCallback: StateCallback<STATE, CONFIG>,
-    options: CONFIG
+    options?: CONFIG
   ) {
-    const arbeiter = new Arbeiter<STATE, CONFIG>(methodsCallback, options);
+    const defaultOptions = {
+      eval: true,
+      async: true,
+    } as CONFIG;
+
+    const arbeiter = new Arbeiter<STATE, CONFIG>(
+      methodsCallback,
+      options ?? defaultOptions
+    );
     this.arbeiters.push(arbeiter);
     return arbeiter;
   }
