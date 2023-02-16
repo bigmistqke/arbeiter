@@ -185,10 +185,10 @@ const factory = new ArbeiterFactory<{}>();
 
 const arbeiter = factory.construct(() => ({}));
 
-// Individual workers can be terminated with terminate()
+// Individual arbeiters can be terminated with terminate()
 arbeiter.terminate()
 
-// To terminate all workers constructed with the arbeiter
+// To terminate all arbeiters constructed with the factory
 factory.terminate()
 ```
 
