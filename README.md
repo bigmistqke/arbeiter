@@ -8,9 +8,12 @@ Allows for dynamically creating workers with manageable state.
 - simple example
 
 ```ts
-import Arbeiter from "arbeiter";
+import Factory from "arbeiter";
 
-const arbeiter = new Arbeiter(() => ({
+// the arbeiters' types have to be explicitly typed inside Factory's generic.
+const factory = new Factory<{counter: number, increment: () => number}>();
+
+const arbeiter = factory.construct(() => ({
   counter: 0,
   increment: function () {
     // only state accessed with `this` can be manipulated
@@ -18,7 +21,8 @@ const arbeiter = new Arbeiter(() => ({
   },
 }));
 
-// all functions are converted into async functions (through postMessage)
+// all functions are converted into async functions 
+// (except if configured differently, see below)
 // and are accessible in `arbeiter.methods`
 arbeiter.methods.increment().then(
   value => value // 1
@@ -28,14 +32,16 @@ arbeiter.methods.increment().then(
 - transfer `OffscreenCanvas`
 
 ```ts
-import Arbeiter from "arbeiter";
+import Factory from "arbeiter";
 
-const arbeiter = new Arbeiter<{
+const factory = new Factory<{
   canvas?: OffscreenCanvas,
   context?:
   transfer: (canvas: OffscreenCanvas) => void
   fill: (color: string) => void
-}>(() => ({
+}>();
+
+const arbeiter = factory.construct(() => ({
   canvas: undefined,
   transfer: function (canvas) {
     this.canvas = canvas;
@@ -53,6 +59,89 @@ const canvas = document.createElement('canvas');
 arbeiter.methods.transfer(canvas.transferControlToOffscreen()).then(
   () => arbeiter.methods.fill("red")
 )
+```
+
+- function-parameters
+
+```ts
+import Factory from "arbeiter";
+
+const factory = new Factory<{
+  func: (callback: (number: number) => void) => void
+}>();
+
+const arbeiter = factory.construct(() => ({
+  func: function(callback) {
+    callback(Math.random());
+  }
+}));
+
+// All functions passed as arguments have to be serializable and not rely on variables outside its scope
+// variables available on this can be accessed and manipulated
+arbeiter.methods.func((number) => console.log('random number', number)) // worker will log `random number 0.1522...`
+arbeiter.methods.func((number) => console.log('number random', number)) // worker will log `number random 0.1522...`
+
+// Functions can normally not be serialized with workers
+// Arbeiter uses `.toString` and `eval` under the hood to pass the function and execute the function
+// `eval` has performance and security implications, so be careful.
+```
+
+- options-config
+
+```ts
+// You can disable passing around and `eval`ing functions with an optional secondary parameter
+const arbeiter = factory.construct(() => ({
+  func: function(callback) {
+    // will give type-error, since callback will be a string
+    callback(Math.random());
+  }
+}), {
+  eval: false
+});
+
+// if options.methods[methodName].eval is defined, it will overwrite the global config
+const arbeiter = factory.construct(() => ({
+  func: function(callback) {
+    // will give type-error, since callback will be a string
+    callback(Math.random());
+  }
+}), {
+  eval: true,
+  methods: {
+    func: {
+      eval: false
+    }
+  }
+});
+
+// If you want to remove the overhead of the arbeiter responding back after each execution
+// You can disable this functionality inside the config with the `async`-parameter
+
+// The methods affected will not be cast to a sync function, but the async functions will never resolve
+
+const arbeiter = factory.construct(() => ({
+  func: function(callback) {
+    return 'resolved'
+  }
+}), {
+  async: false
+});
+
+// Just as with `eval`, `async` can be configured for individual methods too
+const arbeiter = factory.construct(() => ({
+  func: function(callback) {
+    return 'resolved'
+  }
+}), {
+  async: false,
+  methods: {
+    func: {
+      async: true
+    }
+  }
+});
+
+arbeiter.methods.func().then((message) => console.log(message)); // console.log() will be called
 ```
 
 # Acknowledgements
