@@ -1,7 +1,7 @@
 # Arbeiter
 
-A worker-helper for in-browser.
-Allows for state to be managed
+A worker-helper for in-browser.</br>
+Allows for dynamically creating workers with manageable state.
 
 # How to use
 
