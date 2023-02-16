@@ -49,6 +49,7 @@ const arbeiter = new Arbeiter<{
 }));
 
 const canvas = document.createElement('canvas');
+// transferable objects are automagically transferred
 arbeiter.methods.transfer(canvas.transferControlToOffscreen()).then(
   () => arbeiter.methods.fill("red")
 )
