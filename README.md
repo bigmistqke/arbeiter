@@ -34,16 +34,16 @@ methods.increment().then(
 - transfer `OffscreenCanvas`
 
 ```ts
-import Factory from "arbeiter";
+import ArbeiterFactory from "arbeiter";
 
-const arbeiter = new Arbeiter<{
+const factory = new ArbeiterFactory<{
   canvas?: OffscreenCanvas,
   context?:
   transfer: (canvas: OffscreenCanvas) => void
   fill: (color: string) => void
 }>();
 
-const { methods, terminate } = arbeiter.construct(() => ({
+const arbeiter = factory.construct(() => ({
   canvas: undefined,
   transfer: function (canvas) {
     this.canvas = canvas;
@@ -59,7 +59,7 @@ const { methods, terminate } = arbeiter.construct(() => ({
 const canvas = document.createElement('canvas');
 
 // Transferable objects are automagically transferred
-methods.transfer(canvas.transferControlToOffscreen()).then(
+arbeiter.methods.transfer(canvas.transferControlToOffscreen()).then(
   () => methods.fill("red")
 )
 ```
@@ -67,13 +67,13 @@ methods.transfer(canvas.transferControlToOffscreen()).then(
 - function-parameters
 
 ```ts
-import Arbeiter from "arbeiter";
+import ArbeiterFactory from "arbeiter";
 
-const arbeiter = new Arbeiter<{
+const factory = new ArbeiterFactory<{
   func: (callback: (number: number) => void) => void;
 }>();
 
-const { methods, terminate } = arbeiter.construct(() => ({
+const arbeiter = factory.construct(() => ({
   func: function (callback) {
     callback(Math.random());
   },
@@ -81,10 +81,10 @@ const { methods, terminate } = arbeiter.construct(() => ({
 
 // All functions passed as arguments have to be serializable 
 // Variables available on `this` can be accessed and manipulated
-methods.func(number => 
+arbeiter.methods.func(number => 
   console.log("random number", number)
 ); // worker will log `random number 0.1522...`
-methods.func(number => 
+arbeiter.methods.func(number => 
   console.log("number random", number)
 ); // worker will log `number random 0.1522...`
 
@@ -100,7 +100,7 @@ methods.func(number =>
 ```ts
 // You can disable passing around and `eval`ing functions 
 // with an optional secondary parameter
-arbeiter.construct(
+factory.construct(
   () => ({
     func: function (callback) {
       // will give type-error, since callback will be a string
@@ -114,7 +114,7 @@ arbeiter.construct(
 
 // if options.methods[methodName].eval is defined, 
 // it will overwrite the global config
-arbeiter.construct(
+factory.construct(
   () => ({
     func: function (callback) {
       // will give type-error, since callback will be a string
@@ -141,7 +141,7 @@ arbeiter.construct(
 // The methods affected will not be cast to a sync function
 // but the async functions will never resolve
 
-const { methods } = arbeiter.construct(
+const arbeiter = factory.construct(
   () => ({
     func: function (callback) {
       return "resolved";
@@ -152,12 +152,12 @@ const { methods } = arbeiter.construct(
   }
 );
 
-methods.func().then(message => 
+arbeiter.methods.func().then(message => 
   console.log(message)
 ); // console.log() will never be called
 
 // Just as with `eval`, `async` can be configured for individual methods too
-const { methods, terminate } = factory.construct(
+const arbeiter = factory.construct(
   () => ({
     func: function (callback) {
       return "resolved";
@@ -173,7 +173,7 @@ const { methods, terminate } = factory.construct(
   }
 );
 
-methods.func().then(message => 
+arbeiter.methods.func().then(message => 
   console.log(message)
 ); // console.log() will be called
 ```
@@ -181,17 +181,17 @@ methods.func().then(message =>
 - terminate workers
 
 ```ts
-import Factory from "arbeiter";
+import ArbeiterFactory from "arbeiter";
 
-const arbeiter = new Arbeiter<{}>();
+const factory = new ArbeiterFactory<{}>();
 
-const { methods, terminate } = arbeiter.construct(() => ({}));
+const arbeiter = factory.construct(() => ({}));
 
 // Individual workers can be terminated with terminate()
-terminate()
+arbeiter.terminate()
 
 // To terminate all workers constructed with the arbeiter
-arbeiter.terminate()
+factory.terminate()
 ```
 
 # Acknowledgements
