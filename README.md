@@ -1,7 +1,10 @@
 # Arbeiter
 
 A worker-helper for in-browser.</br>
-Allows for dynamically creating workers with manageable state.
+- dynamically create workers with state and methods capable of manipulating state
+- `postMessage` is abstracted away behind `async` method-calls
+- transfer transferable objects automatically
+- pass functions to workers
 
 # How to use
 
