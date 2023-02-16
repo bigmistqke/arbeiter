@@ -4,11 +4,11 @@ import { FilterObject, Normalize } from "./ts-helpers";
 
 export type Config<State> = {
   eval?: boolean;
-  async?: boolean;
+  resolve?: boolean;
   methods?: Normalize<
     MapObject<
       FilterObjectForFunction<State>,
-      { async?: boolean; eval?: boolean }
+      { resolve?: boolean; eval?: boolean }
     >
   >;
 };

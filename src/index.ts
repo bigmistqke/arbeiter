@@ -19,7 +19,7 @@ class Arbeiter<STATE, CONFIG extends Config<STATE>> {
   } = {};
 
   constructor(methodsCallback: StateCallback<STATE, CONFIG>, options: CONFIG) {
-    let methods = methodsCallback();
+    const methods = methodsCallback();
     this.worker = this.getWorker(methodsCallback);
     this.worker.onmessage = this.onmessage;
     this.methods = this.getMethods(methods);
@@ -31,13 +31,13 @@ class Arbeiter<STATE, CONFIG extends Config<STATE>> {
     const methodOptions = Object.fromEntries(
       Object.keys(this.methods).map(key => [
         key,
-        { eval: !!options.eval, async: !!options.async },
+        { eval: !!options.eval, resolve: !!options.resolve },
       ])
     );
 
     const defaultOptions = {
       eval: true,
-      async: !!options.async,
+      resolve: !!options.resolve,
       methods: methodOptions,
     } as CONFIG;
 
@@ -83,7 +83,7 @@ class Arbeiter<STATE, CONFIG extends Config<STATE>> {
               }
 
               const options = this.options.methods[key] ?? {
-                async: this.options.async,
+                resolve: this.options.resolve,
                 eval: this.options.eval,
               };
 
@@ -126,7 +126,7 @@ onmessage = function ({data}) {
       }
     }
     const response = methods[key](...args);
-    if("options" in data && !data.options.async) return
+    if("options" in data && !data.options.resolve) return
     postMessage([id, response])
     return;
   }
@@ -153,7 +153,7 @@ export default class Factory<STATE> {
   ) {
     const defaultOptions = {
       eval: true,
-      async: true,
+      resolve: true,
     } as CONFIG;
 
     const arbeiter = new Arbeiter<STATE, CONFIG>(
