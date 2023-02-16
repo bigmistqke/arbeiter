@@ -97,9 +97,9 @@ arbeiter.methods.func(number =>
 
 - options-config: `eval`
 
+You can disable passing around and `eval`ing functions with an optional secondary parameter.
+
 ```ts
-// You can disable passing around and `eval`ing functions 
-// with an optional secondary parameter
 const arbeiter = factory.construct(
   () => ({
     func: function (callback) {
@@ -113,9 +113,9 @@ const arbeiter = factory.construct(
 );
 ```
 
+If options.methods[methodName].eval is defined, it will overwrite the global config.
+
 ```ts
-// if options.methods[methodName].eval is defined, 
-// it will overwrite the global config
 const arbeiter = factory.construct(
   () => ({
     func: function (callback) {
@@ -137,12 +137,10 @@ const arbeiter = factory.construct(
 - options-config: `resolve`
 
 
-```ts
-// There is a bit of overhead in the worker's responding after each execution.
-// These responses can be disabled in the config with the `async`-parameter
+There is a bit of overhead in the worker responding after each execution.</br>
+These responses can be disabled in the config with the `resolve`-parameter.</br>
 
-// The methods affected will not be cast to a sync function
-// but the async functions will never resolve
+```ts
 
 const arbeiter = factory.construct(
   () => ({
@@ -151,18 +149,17 @@ const arbeiter = factory.construct(
     },
   }),
   {
-    async: false,
+    resolve: false,
   }
 );
-```
-
-```ts
-
 arbeiter.methods.func().then(message => 
   console.log(message)
 ); // console.log() will never be called
+```
 
-// Just as with `eval`, `async` can be configured for individual methods too
+Just as with `eval`, `resolve` can be configured for individual methods too.
+
+```ts
 const arbeiter = factory.construct(
   () => ({
     func: function (callback) {
@@ -170,10 +167,10 @@ const arbeiter = factory.construct(
     },
   }),
   {
-    async: false,
+    resolve: false,
     methods: {
       func: {
-        async: true,
+        resolve: true,
       },
     },
   }
