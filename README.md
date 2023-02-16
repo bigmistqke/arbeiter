@@ -106,7 +106,7 @@ methods.func(number =>
 arbeiter.construct(
   () => ({
     func: function (callback) {
-      // will give type-error, since callback will be a string
+      // type-error since callback will be a string
       callback(Math.random());
     },
   }),
@@ -120,15 +120,15 @@ arbeiter.construct(
 arbeiter.construct(
   () => ({
     func: function (callback) {
-      // will give type-error, since callback will be a string
+      // no type-error
       callback(Math.random());
     },
   }),
   {
-    eval: true,
+    eval: false,
     methods: {
       func: {
-        eval: false,
+        eval: true,
       },
     },
   }
