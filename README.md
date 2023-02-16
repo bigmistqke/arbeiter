@@ -130,7 +130,9 @@ arbeiter.construct(
     },
   }
 );
+```
 
+```ts
 // If you want to remove the overhead of the arbeiter 
 // responding back after each execution
 // You can disable this functionality inside 
