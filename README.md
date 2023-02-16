@@ -40,7 +40,7 @@ const arbeiter = new Arbeiter<{
   fill: (color: string) => void
 }>();
 
-const {methods, terminate} = arbeiter.construct(() => ({
+const { methods, terminate } = arbeiter.construct(() => ({
   canvas: undefined,
   transfer: function (canvas) {
     this.canvas = canvas;
