@@ -10,8 +10,11 @@ Allows for dynamically creating workers with manageable state.
 ```ts
 import Arbeiter from "arbeiter";
 
-// the arbeiters' types have to be explicitly typed inside Arbeiter's generic.
-const arbeiter = new Arbeiter<{ counter: number; increment: () => number }>();
+// The arbeiters' types have to be explicitly typed inside Arbeiter's generic.
+const arbeiter = new Arbeiter<{ 
+  counter: number; 
+  increment: () => number 
+}>();
 
 const { methods, terminate } = arbeiter.construct(() => ({
   counter: 0,
@@ -21,7 +24,7 @@ const { methods, terminate } = arbeiter.construct(() => ({
   },
 }));
 
-// all functions are converted into async functions
+// All functions are converted into async functions
 // and are accessible in `methods`
 methods.increment().then(
   value => value // 1
@@ -40,7 +43,7 @@ const arbeiter = new Arbeiter<{
   fill: (color: string) => void
 }>();
 
-const {methods, terminate} = arbeiter.construct(() => ({
+const { methods, terminate } = arbeiter.construct(() => ({
   canvas: undefined,
   transfer: function (canvas) {
     this.canvas = canvas;
@@ -54,7 +57,8 @@ const {methods, terminate} = arbeiter.construct(() => ({
 }));
 
 const canvas = document.createElement('canvas');
-// transferable objects are automagically transferred
+
+// Transferable objects are automagically transferred
 methods.transfer(canvas.transferControlToOffscreen()).then(
   () => methods.fill("red")
 )
@@ -75,20 +79,27 @@ const { methods, terminate } = arbeiter.construct(() => ({
   },
 }));
 
-// All functions passed as arguments have to be serializable and not rely on variables outside its scope
-// variables available on this can be accessed and manipulated
-methods.func(number => console.log("random number", number)); // worker will log `random number 0.1522...`
-methods.func(number => console.log("number random", number)); // worker will log `number random 0.1522...`
+// All functions passed as arguments have to be serializable 
+// Variables available on `this` can be accessed and manipulated
+methods.func(number => 
+  console.log("random number", number)
+); // worker will log `random number 0.1522...`
+methods.func(number => 
+  console.log("number random", number)
+); // worker will log `number random 0.1522...`
 
 // Functions can normally not be serialized with workers
-// Arbeiter uses `.toString` and `eval` under the hood to pass the function and execute the function
+// To be able to pass and execute the function
+// Arbeiter uses `.toString` and `eval` under the hood 
+
 // `eval` has performance and security implications, so be careful.
 ```
 
 - options-config
 
 ```ts
-// You can disable passing around and `eval`ing functions with an optional secondary parameter
+// You can disable passing around and `eval`ing functions 
+// with an optional secondary parameter
 arbeiter.construct(
   () => ({
     func: function (callback) {
@@ -101,7 +112,8 @@ arbeiter.construct(
   }
 );
 
-// if options.methods[methodName].eval is defined, it will overwrite the global config
+// if options.methods[methodName].eval is defined, 
+// it will overwrite the global config
 arbeiter.construct(
   () => ({
     func: function (callback) {
@@ -119,10 +131,13 @@ arbeiter.construct(
   }
 );
 
-// If you want to remove the overhead of the arbeiter responding back after each execution
-// You can disable this functionality inside the config with the `async`-parameter
+// If you want to remove the overhead of the arbeiter 
+// responding back after each execution
+// You can disable this functionality inside 
+// the config with the `async`-parameter
 
-// The methods affected will not be cast to a sync function, but the async functions will never resolve
+// The methods affected will not be cast to a sync function
+// but the async functions will never resolve
 
 const { methods } = arbeiter.construct(
   () => ({
@@ -135,7 +150,9 @@ const { methods } = arbeiter.construct(
   }
 );
 
-methods.func().then(message => console.log(message)); // console.log() will never be called
+methods.func().then(message => 
+  console.log(message)
+); // console.log() will never be called
 
 // Just as with `eval`, `async` can be configured for individual methods too
 const { methods, terminate } = factory.construct(
@@ -154,7 +171,25 @@ const { methods, terminate } = factory.construct(
   }
 );
 
-methods.func().then(message => console.log(message)); // console.log() will be called
+methods.func().then(message => 
+  console.log(message)
+); // console.log() will be called
+```
+
+- terminate workers
+
+```ts
+import Factory from "arbeiter";
+
+const arbeiter = new Arbeiter<{}>();
+
+const { methods, terminate } = arbeiter.construct(() => ({}));
+
+// Individual workers can be terminated with terminate()
+terminate()
+
+// To terminate all workers constructed with the arbeiter
+arbeiter.terminate()
 ```
 
 # Acknowledgements
