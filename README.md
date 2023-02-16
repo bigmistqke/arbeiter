@@ -95,7 +95,7 @@ arbeiter.methods.func(number =>
 // `eval` has performance and security implications, so be careful.
 ```
 
-- options-config
+- options-config: `eval`
 
 ```ts
 // You can disable passing around and `eval`ing functions 
@@ -111,7 +111,9 @@ const arbeiter = factory.construct(
     eval: false,
   }
 );
+```
 
+```ts
 // if options.methods[methodName].eval is defined, 
 // it will overwrite the global config
 const arbeiter = factory.construct(
@@ -132,6 +134,9 @@ const arbeiter = factory.construct(
 );
 ```
 
+- options-config: `resolve`
+
+
 ```ts
 // There is a bit of overhead in the worker's responding after each execution.
 // These responses can be disabled in the config with the `async`-parameter
@@ -149,6 +154,9 @@ const arbeiter = factory.construct(
     async: false,
   }
 );
+```
+
+```ts
 
 arbeiter.methods.func().then(message => 
   console.log(message)
