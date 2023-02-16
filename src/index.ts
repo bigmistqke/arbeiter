@@ -6,6 +6,8 @@ type Promisify<T extends { [key: string]: any }> = {
 };
 type FilterFunction<T> = FilterObject<T, Function>;
 
+// const FUNCTION = Symbol('arbeiter-function')
+
 export default class Werker<STATE> {
   methods: Promisify<FilterFunction<STATE>>;
   private worker: Worker;
@@ -43,13 +45,22 @@ export default class Werker<STATE> {
                   v instanceof WritableStream ||
                   v instanceof TransformStream ||
                   // AudioData is `experimental technology`
-                  v instanceof AudioData ||
+                  // v instanceof AudioData ||
                   v instanceof ImageBitmap ||
                   // VideoFrame is `experimental technology`
-                  v instanceof VideoFrame ||
+                  // v instanceof VideoFrame ||
                   v instanceof OffscreenCanvas ||
                   v instanceof RTCDataChannel
               );
+
+              // .toString() functions so we can `eval` them later
+              for (const index in args) {
+                if (typeof args[index] === "function")
+                  args[index] = {
+                    type: "FUNCTION",
+                    string: args[index].toString(),
+                  };
+              }
 
               this.worker.postMessage(
                 [this.messageId, key, args],
@@ -72,8 +83,16 @@ export default class Werker<STATE> {
     `
 const methods = (${m.toString()})();
 
-onmessage = function ({data: [id, key, arguments]}) {
-  const response = methods[key](...arguments);
+onmessage = function ({data: [id, key, args]}) {
+  let value;
+  for (const index in args) {
+    value = args[index]
+    if (typeof value === 'object' && value.type === "FUNCTION") {
+      args[index] = eval(value.string)
+    }
+  }
+
+  const response = methods[key](...args);
   postMessage([id, response])
   return;
 }
