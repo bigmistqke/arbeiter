@@ -1,7 +1,10 @@
 # Arbeiter
 
 A worker-helper for in-browser.</br>
-Allows for dynamically creating workers with manageable state.
+- dynamically create workers with state and methods capable of manipulating state
+- `postMessage` is abstracted away behind `async` method-calls
+- transfer transferable objects automatically
+- pass functions to workers
 
 # How to use
 
@@ -103,7 +106,7 @@ arbeiter.methods.func(number =>
 factory.construct(
   () => ({
     func: function (callback) {
-      // will give type-error, since callback will be a string
+      // type-error since callback will be a string
       callback(Math.random());
     },
   }),
@@ -117,15 +120,15 @@ factory.construct(
 factory.construct(
   () => ({
     func: function (callback) {
-      // will give type-error, since callback will be a string
+      // no type-error
       callback(Math.random());
     },
   }),
   {
-    eval: true,
+    eval: false,
     methods: {
       func: {
-        eval: false,
+        eval: true,
       },
     },
   }
