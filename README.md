@@ -22,7 +22,6 @@ const arbeiter = factory.construct(() => ({
 }));
 
 // all functions are converted into async functions 
-// (except if configured differently, see below)
 // and are accessible in `arbeiter.methods`
 arbeiter.methods.increment().then(
   value => value // 1
