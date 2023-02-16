@@ -1,25 +1,22 @@
 # Arbeiter
 
 A worker-helper for in-browser.</br>
-- dynamically create workers with state and methods capable of manipulating state
-- `postMessage` is abstracted away behind `async` method-calls
-- transfer transferable objects automatically
-- pass functions to workers
+Allows for dynamically creating workers with manageable state.
 
 # How to use
 
 - simple example
 
 ```ts
-import Arbeiter from "arbeiter";
+import ArbeiterFactory from "arbeiter";
 
 // The arbeiters' types have to be explicitly typed inside Arbeiter's generic.
-const arbeiter = new Arbeiter<{ 
+const factory = new ArbeiterFactory<{ 
   counter: number; 
   increment: () => number 
 }>();
 
-const { methods, terminate } = arbeiter.construct(() => ({
+const arbeiter = factory.construct(() => ({
   counter: 0,
   increment: function () {
     // only state accessed with `this` can be manipulated
@@ -29,7 +26,7 @@ const { methods, terminate } = arbeiter.construct(() => ({
 
 // All functions are converted into async functions
 // and are accessible in `methods`
-methods.increment().then(
+arbeiter.methods.increment().then(
   value => value // 1
 );
 ```
@@ -103,10 +100,10 @@ arbeiter.methods.func(number =>
 ```ts
 // You can disable passing around and `eval`ing functions 
 // with an optional secondary parameter
-factory.construct(
+const arbeiter = factory.construct(
   () => ({
     func: function (callback) {
-      // type-error since callback will be a string
+      // will give type-error, since callback will be a string
       callback(Math.random());
     },
   }),
@@ -117,18 +114,18 @@ factory.construct(
 
 // if options.methods[methodName].eval is defined, 
 // it will overwrite the global config
-factory.construct(
+const arbeiter = factory.construct(
   () => ({
     func: function (callback) {
-      // no type-error
+      // will give type-error, since callback will be a string
       callback(Math.random());
     },
   }),
   {
-    eval: false,
+    eval: true,
     methods: {
       func: {
-        eval: true,
+        eval: false,
       },
     },
   }
@@ -136,10 +133,8 @@ factory.construct(
 ```
 
 ```ts
-// If you want to remove the overhead of the arbeiter 
-// responding back after each execution
-// You can disable this functionality inside 
-// the config with the `async`-parameter
+// There is a bit of overhead in the worker's responding after each execution.
+// These responses can be disabled in the config with the `async`-parameter
 
 // The methods affected will not be cast to a sync function
 // but the async functions will never resolve
