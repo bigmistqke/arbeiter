@@ -36,7 +36,19 @@ export default class Werker<STATE> {
               this.responseQueue[this.messageId] = { resolve };
 
               const transferables = args.filter(
-                v => v instanceof OffscreenCanvas
+                v =>
+                  v instanceof ArrayBuffer ||
+                  v instanceof MessagePort ||
+                  v instanceof ReadableStream ||
+                  v instanceof WritableStream ||
+                  v instanceof TransformStream ||
+                  // AudioData is `experimental technology`
+                  v instanceof AudioData ||
+                  v instanceof ImageBitmap ||
+                  // VideoFrame is `experimental technology`
+                  v instanceof VideoFrame ||
+                  v instanceof OffscreenCanvas ||
+                  v instanceof RTCDataChannel
               );
 
               this.worker.postMessage(
